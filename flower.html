@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flower</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+            perspective: 1000px;
+        }
+
+        .flower-container {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+        }
+
+        .flower-center {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #1e88e5, #0d47a1);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(30, 136, 229, 0.7);
+            z-index: 10;
+            animation: pulse 3s infinite alternate;
+            transform: translateZ(20px);
+        }
+
+        .petal {
+            position: absolute;
+            width: 120px;
+            height: 100px;
+            background: linear-gradient(to bottom, #64b5f6, #1976d2);
+            border-radius: 60px 60px 0 0;
+            transform-origin: bottom center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(100, 181, 246, 0.5);
+            z-index: 5;
+            transform-style: preserve-3d;
+        }
+
+        .petal:hover {
+            background: linear-gradient(to bottom, #42a5f5, #1565c0);
+            box-shadow: 0 0 30px rgba(66, 165, 245, 0.9);
+            transform: scale(1.05) translateY(-5px) translateZ(10px);
+        }
+
+        .petal.active {
+            animation: glow 1s infinite alternate;
+            transform: scale(1.1) translateY(-10px) translateZ(20px);
+        }
+
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(30px);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            max-width: 300px;
+            text-align: center;
+            z-index: 20;
+            font-size: 18px;
+            color: #333;
+            backdrop-filter: blur(5px);
+        }
+
+        .message.show {
+            opacity: 1;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translateZ(20px) scale(1);
+                box-shadow: 0 0 30px rgba(30, 136, 229, 0.7);
+            }
+
+            100% {
+                transform: translateZ(20px) scale(1.05);
+                box-shadow: 0 0 50px rgba(30, 136, 229, 0.9);
+            }
+        }
+
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 15px rgba(66, 165, 245, 0.7);
+            }
+
+            100% {
+                box-shadow: 0 0 40px rgba(66, 165, 245, 1);
+            }
+        }
+
+        .stem {
+            position: absolute;
+            width: 20px;
+            height: 300px;
+            background: linear-gradient(to bottom, #388e3c, #2e7d32);
+            bottom: -150px;
+            border-radius: 10px;
+            z-index: 0;
+            transform: translateZ(-10px);
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div class="flower-container">
+        <div class="stem"></div>
+        <div class="leaf"></div>
+        <div class="leaf"></div>
+        <div class="flower-center"></div>
+        <div class="message" id="message"></div>
+
+    </div>
+
+    <script>
+        const petalMessages = [
+            "I LOVE YOUR SMILE POOKS",
+            "YOU HAVE BIG BRAIN!!!",
+            "KEEP TRYING TO POOP IT OUT",
+            "YOU DA REAL BIG LEADER",
+            "YOU ARE THE BEST",
+            "YOU ARE THE BESTESTEST",
+            "YOU ARE THE BESTESTESTEST",
+            "MAH QUEEN GOAT",
+            "YOURE NOW FREEEE ENJOYYYYYYY NO MORE UNDERGRAD CLASSES"
+            
+        ];
+
+        const flowerContainer = document.querySelector('.flower-container');
+        const message = document.getElementById('message');
+
+       
+        for (let i = 0; i < 8; i++) {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+
+            const angle = (i * 45) * (Math.PI / 180);
+            const radius = 120;
+            const x = radius * Math.cos(angle);
+            const y = radius * Math.sin(angle);
+            const z = Math.abs(Math.sin(angle * 2)) * 30; 
+
+            petal.style.transform = `
+                rotate(${i * 45}deg) 
+                translateY(-${radius}px) 
+                translateZ(${z}px)
+                rotateX(10deg)
+            `;
+            petal.style.left = `calc(50% - 60px)`;
+            petal.style.top = `calc(50% - 100px)`;
+            petal.style.opacity = '0';
+
+
+            petal.addEventListener('click', function () {
+              
+                document.querySelectorAll('.petal').forEach(p => {
+                    p.classList.remove('active');
+                });
+
+
+                this.classList.add('active');
+
+
+                const randomMessage = petalMessages[Math.floor(Math.random() * petalMessages.length)];
+                message.textContent = randomMessage;
+                message.classList.add('show');
+
+
+                setTimeout(() => {
+                    message.classList.remove('show');
+                    this.classList.remove('active');
+                }, 2000);
+            });
+
+            flowerContainer.appendChild(petal);
+        }
+
+
+        setTimeout(() => {
+            const petals = document.querySelectorAll('.petal');
+            petals.forEach((petal, index) => {
+                setTimeout(() => {
+                    petal.style.transition = 'all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                    petal.style.opacity = '1';
+
+
+                    const angle = (index * 45) * (Math.PI / 180);
+                    const z = Math.abs(Math.sin(angle * 2)) * 30;
+
+                    petal.style.transform = `
+                        rotate(${index * 45}deg) 
+                        translateY(-120px) 
+                        translateZ(${z}px)
+                        rotateX(10deg)
+                    `;
+                }, index * 150);
+            });
+        }, 500);
+
+
+        flowerContainer.style.animation = 'sway 8s infinite alternate ease-in-out';
+        document.head.insertAdjacentHTML('beforeend', `
+            <style>
+                @keyframes sway {
+                    0% { transform: rotateZ(-2deg); }
+                    100% { transform: rotateZ(2deg); }
+                }
+            </style>
+        `);
+    </script>
+</body>
+
+</html>
